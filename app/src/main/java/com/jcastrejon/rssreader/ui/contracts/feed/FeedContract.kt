@@ -73,6 +73,23 @@ class FeedContract {
          * @param itemPosition, the position of the item
          */
         fun navigateToItemDetail(itemPosition: Int)
+
+        /**
+         * Set the message value
+         *
+         * @param textRest, the string resource
+         */
+        fun setMessage(textRest: Int)
+
+        /**
+         * Hide the message
+         */
+        fun hideMessage()
+
+        /**
+         * Show the message
+         */
+        fun showMessage()
     }
 
     /**

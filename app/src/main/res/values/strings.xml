@@ -2,8 +2,7 @@
     <string name="app_name">RssReader</string>
     <string name="search">search</string>
     <string name="filter">filter:</string>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <string name="internetError">There was a problem with the network, try again later</string>
+    <string name="unknownError">Ops! Something has occurred, try again later</string>
+    <string name="empty_list_message">There are not items yet</string>
 </resources>
