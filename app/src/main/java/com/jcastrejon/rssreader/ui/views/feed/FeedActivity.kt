@@ -22,7 +22,10 @@ import org.koin.android.ext.android.inject
  */
 class FeedActivity : BaseActivity(), FeedContract.View {
 
-    private val CURRENT_FILTER = "CURRENT_FILTER"
+    companion object {
+
+        private const val CURRENT_FILTER = "CURRENT_FILTER"
+    }
 
     override val layoutId: Int = R.layout.activity_feed
     override val toolbarView: Toolbar
@@ -93,6 +96,18 @@ class FeedActivity : BaseActivity(), FeedContract.View {
 
     override fun navigateToItemDetail(itemPosition: Int) {
         //open the detail screen
+    }
+
+    override fun setMessage(textRest: Int) {
+        message.setText(textRest)
+    }
+
+    override fun hideMessage() {
+        message.hide()
+    }
+
+    override fun showMessage() {
+        message.show()
     }
 
     /**

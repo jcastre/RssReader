@@ -1,17 +1,20 @@
 package com.jcastrejon.rssreader.ui.presenters.feed
 
+import com.jcastrejon.rssreader.R
 import com.jcastrejon.rssreader.common.EMPTY_STRING
-import com.jcastrejon.rssreader.domain.models.FeedItem
+import com.jcastrejon.rssreader.domain.models.*
+import com.jcastrejon.rssreader.domain.usecases.GetFeedUseCase
 import com.jcastrejon.rssreader.ui.contracts.feed.FeedContract
 
 /**
  * Presenter with the logic of the feed screen
  */
-class FeedPresenter(private val view: FeedContract.View) : FeedContract.Presenter {
+class FeedPresenter(private val view: FeedContract.View,
+                    val getFeed: GetFeedUseCase) : FeedContract.Presenter {
 
     override fun onResume() {
         showLoading()
-        showMocks()
+        getFeed { result -> handleResult(result)}
     }
 
     override fun onItemClicked(itemPosition: Int) {
@@ -46,34 +49,64 @@ class FeedPresenter(private val view: FeedContract.View) : FeedContract.Presente
      */
     private fun showLoading() {
         view.hideContent()
+        view.hideMessage()
         view.showProgress()
     }
 
     /**
-     * Show the progress bar and hide the content
+     * Handle the result and take the corresponding action
      */
-    private fun hideLoading() {
+    private fun handleResult(result: Result<List<FeedItem>, DomainError>) {
+        when (result) {
+            is Success -> { handleSuccess(result.value) }
+            is Error -> { handleErrors(result.value) }
+        }
+    }
+
+    /**
+     * Handle the success result
+     *
+     * @param items
+     */
+    private fun handleSuccess(items: List<FeedItem>) {
+        when {
+            items.isEmpty() -> { showMessage(R.string.empty_list_message) }
+            else -> { showItems(items) }
+        }
+    }
+
+    /**
+     * Handle errors
+     *
+     * @param error
+     */
+    private fun handleErrors(error: DomainError) {
+        when (error) {
+            InternetError -> { showMessage(R.string.internetError) }
+            UnknownError -> { showMessage(R.string.unknownError) }
+        }
+    }
+
+    /**
+     * Show the items
+     *
+     * @param items, the collection with the items
+     */
+    private fun showItems(items: List<FeedItem>) {
         view.hideProgress()
+        view.showItems(items)
         view.showContent()
     }
 
     /**
-     * [Provisional]
+     * Show a message instead the list of movies
      *
-     * Show the mock items
+     * @param textRest
      */
-    private fun showMocks() {
-        view.showItems(
-                listOf(
-                        FeedItem(0,
-                                "a1",
-                                "b1",
-                                "http://www.gstatic.com/webp/gallery/1.jpg"),
-                        FeedItem(1,
-                                "a2",
-                                "b2",
-                                "http://www.gstatic.com/webp/gallery/1.jpg")))
-        hideLoading()
+    private fun showMessage(textRest: Int) {
+        view.hideProgress()
+        view.setMessage(textRest)
+        view.showMessage()
     }
 
     /**
