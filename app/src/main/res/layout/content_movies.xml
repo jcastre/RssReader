@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_feed">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/grey">
+
+        <EditText
+            android:id="@+id/input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/black"
+            android:backgroundTint="@android:color/black"
+            android:hint="@string/search"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingRight="@dimen/common_separator_distance"
+            android:paddingLeft="@dimen/common_separator_distance"
+            android:layout_marginLeft="@dimen/common_separator_distance"
+            android:layout_marginRight="@dimen/common_separator_distance"/>
+
+        <ImageView
+            android:id="@+id/search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="@dimen/common_separator_distance"
+            android:tint="@android:color/black"
+            app:srcCompat="@android:drawable/ic_menu_search"
+            android:background="?android:attr/selectableItemBackground"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:background="@color/grey">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter"
+                android:padding="@dimen/common_separator_distance"
+                android:layout_marginLeft="@dimen/common_separator_distance"
+                android:layout_marginRight="@dimen/common_separator_distance"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="a"
+                android:lines="1"
+                android:ellipsize="end"
+                android:background="@drawable/bubble"
+                android:paddingLeft="@dimen/common_separator_distance"
+                android:paddingRight="@dimen/common_separator_distance"
+                android:layout_margin="5dp"
+                android:textSize="18sp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/remove_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="@dimen/common_separator_distance"
+            android:tint="@android:color/black"
+            app:srcCompat="@android:drawable/ic_menu_close_clear_cancel"
+            android:background="?android:attr/selectableItemBackground"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:id="@+id/message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:textColor="@android:color/black"
+            android:textSize="24sp"
+            android:visibility="gone"/>
+
+    </FrameLayout>
+
+</LinearLayout>
