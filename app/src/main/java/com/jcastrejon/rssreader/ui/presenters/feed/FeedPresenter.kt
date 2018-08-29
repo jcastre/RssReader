@@ -17,8 +17,8 @@ class FeedPresenter(private val view: FeedContract.View,
         getFeed { result -> handleResult(result)}
     }
 
-    override fun onItemClicked(itemPosition: Int) {
-        view.navigateToItemDetail(itemPosition)
+    override fun onItemClicked(id: Int) {
+        view.navigateToItemDetail(id)
     }
 
     override fun onSearchButtonClicked(input: String) {

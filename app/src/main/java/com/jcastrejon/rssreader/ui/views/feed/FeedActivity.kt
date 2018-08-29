@@ -13,6 +13,7 @@ import com.jcastrejon.rssreader.ui.contracts.feed.FeedContract
 import com.jcastrejon.rssreader.ui.presenters.feed.FeedPresenter
 import com.jcastrejon.rssreader.ui.views.base.BaseActivity
 import com.jcastrejon.rssreader.ui.views.feed.adapter.FeedAdapter
+import com.jcastrejon.rssreader.ui.views.itemDetail.ItemDetailActivity
 import kotlinx.android.synthetic.main.content_movies.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.koin.android.ext.android.inject
@@ -94,8 +95,8 @@ class FeedActivity : BaseActivity(), FeedContract.View {
         hideKeyboard()
     }
 
-    override fun navigateToItemDetail(itemPosition: Int) {
-        //open the detail screen
+    override fun navigateToItemDetail(id: Int) {
+        ItemDetailActivity.startItemDetailActivity(activity = this, itemId = id)
     }
 
     override fun setMessage(textRest: Int) {
@@ -114,7 +115,7 @@ class FeedActivity : BaseActivity(), FeedContract.View {
      * Initialize the adapter
      */
     private fun initializeAdapter() {
-        adapter = FeedAdapter { itemPosition -> presenter.onItemClicked(itemPosition) }
+        adapter = FeedAdapter { id -> presenter.onItemClicked(id) }
     }
 
     /**
