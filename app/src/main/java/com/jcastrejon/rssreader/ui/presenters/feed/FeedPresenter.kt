@@ -12,9 +12,11 @@ import com.jcastrejon.rssreader.ui.contracts.feed.FeedContract
 class FeedPresenter(private val view: FeedContract.View,
                     val getFeed: GetFeedUseCase) : FeedContract.Presenter {
 
+    private var currentFilter = EMPTY_STRING
+
     override fun onResume() {
         showLoading()
-        getFeed { result -> handleResult(result)}
+        getFeed(currentFilter) { result -> handleResult(result)}
     }
 
     override fun onItemClicked(id: Int) {
@@ -23,8 +25,8 @@ class FeedPresenter(private val view: FeedContract.View,
 
     override fun onSearchButtonClicked(input: String) {
         if (input.trim() != EMPTY_STRING) {
-            //todo
-            //filter use case
+            showLoading()
+            getFeed(input.trim()) { result -> handleResult(result)}
             view.closeKeyboard()
             showFilter(input)
             view.clearInput()
@@ -38,8 +40,9 @@ class FeedPresenter(private val view: FeedContract.View,
     }
 
     override fun onRemoveButtonClicked() {
-        //todo
-        //remove filter use case
+        showLoading()
+        getFeed { result -> handleResult(result)}
+        currentFilter = EMPTY_STRING
         view.removeFilter()
         view.hideRemoveFilterButton()
     }
@@ -115,6 +118,7 @@ class FeedPresenter(private val view: FeedContract.View,
      * @param filter the text value
      */
     private fun showFilter(filter: String) {
+        currentFilter = filter.trim()
         view.setFilter(filter)
         view.showFilter()
         view.showRemoveFilterButton()

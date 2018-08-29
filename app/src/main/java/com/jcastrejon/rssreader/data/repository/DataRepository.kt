@@ -3,6 +3,7 @@ package com.jcastrejon.rssreader.data.repository
 import com.jcastrejon.rssreader.data.sources.DataSource
 import com.jcastrejon.rssreader.domain.models.*
 import com.jcastrejon.rssreader.domain.repository.Repository
+import com.jcastrejon.rssreader.utils.EMPTY_STRING
 
 /**
  * Implementation of the repository of the domain layer
@@ -19,11 +20,11 @@ class DataRepository(
     private val cache: LinkedHashMap<Int, FeedItem> = LinkedHashMap()
     private var lastUpdate = 0L
 
-    override fun getFeed(func: (Result<List<FeedItem>, DomainError>) -> Unit) {
+    override fun getFeed(filter: String, func: (Result<List<FeedItem>, DomainError>) -> Unit) {
         if (cache.isEmpty() || !isCacheUpdated()) {
-            remoteDataSource.getFeed { result -> handleGetFeedResultFromRemoteSource(result, func) }
+            remoteDataSource.getFeed { result -> handleGetFeedResultFromRemoteSource(filter, result, func) }
         } else {
-            returnSuccessRequest(func)
+            returnSuccessRequest(filter, func)
         }
     }
 
@@ -34,18 +35,22 @@ class DataRepository(
     /**
      * Handle the result of the get feed request from the remote data source
      *
+     * @param filter, the filter to apply
      * @param result the result of the request
      * @param func the callback to notify the finalization
      */
-    private fun handleGetFeedResultFromRemoteSource(result: Result<List<FeedItem>, DomainError>,
+    private fun handleGetFeedResultFromRemoteSource(filter: String,
+                                                    result: Result<List<FeedItem>, DomainError>,
                                                     func: (Result<List<FeedItem>, DomainError>) -> Unit) {
         if (result is Success) {
             localDataSource.populateData(result.value)
             updateCache(result.value)
-            returnSuccessRequest(func)
+            returnSuccessRequest(filter, func)
         } else if (result is Error) {
             if (result.value is InternetError) {
-                localDataSource.getFeed { localResult -> handleGetFeedResultFromLocalSource(localResult, func) }
+                localDataSource.getFeed {
+                    localResult -> handleGetFeedResultFromLocalSource(filter, localResult, func)
+                }
             } else {
                 func(result)
             }
@@ -55,14 +60,16 @@ class DataRepository(
     /**
      * Handle the result of the get feed request from the local data source
      *
+     * @param filter, the filter to apply
      * @param result the result of the request
      * @param func the callback to notify the finalization
      */
-    private fun handleGetFeedResultFromLocalSource(result: Result<List<FeedItem>, DomainError>,
+    private fun handleGetFeedResultFromLocalSource(filter: String,
+                                                   result: Result<List<FeedItem>, DomainError>,
                                                    func: (Result<List<FeedItem>, DomainError>) -> Unit) {
         if (result is Success) {
             updateCache(result.value)
-            returnSuccessRequest(func)
+            returnSuccessRequest(filter, func)
         } else {
             func(result)
         }
@@ -87,11 +94,17 @@ class DataRepository(
     /**
      * Return the success sorting the result by date
      *
+     * @param filter, the filter to apply
      * @param func, the callback to notify after sorting
      */
-    private fun returnSuccessRequest(func: (Result<List<FeedItem>, DomainError>) -> Unit) {
+    private fun returnSuccessRequest(filter: String, func: (Result<List<FeedItem>, DomainError>) -> Unit) {
         val list = ArrayList(cache.values)
         list.sortByDescending { it.date }
-        func(Success(list))
+
+        if (filter != EMPTY_STRING) {
+            func(Success(list.filter { it.title?.contains(filter, true) ?: false }))
+        } else {
+            func(Success(list))
+        }
     }
 }
