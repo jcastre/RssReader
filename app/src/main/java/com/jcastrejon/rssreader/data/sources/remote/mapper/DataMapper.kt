@@ -7,6 +7,9 @@ import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.StringReader
 import org.xmlpull.v1.XmlPullParserException
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Implementation of the mapper to map RSSFeed
@@ -17,6 +20,8 @@ class DataMapper: Mapper<RSSFeed> {
         private const val IMG_TAG = "img"
 
         private const val SRC_TAG = "src"
+
+        private const val DATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss Z"
     }
 
     override fun map(element: RSSFeed): List<FeedItem> {
@@ -38,7 +43,26 @@ class DataMapper: Mapper<RSSFeed> {
     private fun createItem(id: Int, item: RSSFeedItem): FeedItem {
         val tuple = parseDescription(item.description)
 
-        return FeedItem(id, item.title, tuple.first, tuple.second, item.link)
+        return FeedItem(id, item.title, tuple.first, tuple.second, item.link, parseDate(item.pubDate))
+    }
+
+    /**
+     * parse the date
+     *
+     * @param pubDate, the date in the original format
+     */
+    private fun parseDate(pubDate: String?): String? {
+        var date: String? = null
+
+        if (pubDate != null) {
+            val format = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
+
+            try {
+                date = format.parse(pubDate).time.toString()
+            } catch (e: ParseException){ }
+        }
+
+        return date
     }
 
     /**

@@ -23,7 +23,7 @@ class DataRepository(
         if (cache.isEmpty() || !isCacheUpdated()) {
             remoteDataSource.getFeed { result -> handleGetFeedResultFromRemoteSource(result, func) }
         } else {
-            func(Success(ArrayList(cache.values)))
+            returnSuccessRequest(func)
         }
     }
 
@@ -40,9 +40,9 @@ class DataRepository(
     private fun handleGetFeedResultFromRemoteSource(result: Result<List<FeedItem>, DomainError>,
                                                     func: (Result<List<FeedItem>, DomainError>) -> Unit) {
         if (result is Success) {
-            updateCache(result.value)
             localDataSource.populateData(result.value)
-            func(result)
+            updateCache(result.value)
+            returnSuccessRequest(func)
         } else if (result is Error) {
             if (result.value is InternetError) {
                 localDataSource.getFeed { localResult -> handleGetFeedResultFromLocalSource(localResult, func) }
@@ -62,8 +62,10 @@ class DataRepository(
                                                    func: (Result<List<FeedItem>, DomainError>) -> Unit) {
         if (result is Success) {
             updateCache(result.value)
+            returnSuccessRequest(func)
+        } else {
+            func(result)
         }
-        func(result)
     }
 
     /**
@@ -81,4 +83,15 @@ class DataRepository(
      * Establish if the cache is updated
      */
     private fun isCacheUpdated() = (System.currentTimeMillis() - lastUpdate) < ACCEPTABLE_TIME
+
+    /**
+     * Return the success sorting the result by date
+     *
+     * @param func, the callback to notify after sorting
+     */
+    private fun returnSuccessRequest(func: (Result<List<FeedItem>, DomainError>) -> Unit) {
+        val list = ArrayList(cache.values)
+        list.sortByDescending { it.date }
+        func(Success(list))
+    }
 }
