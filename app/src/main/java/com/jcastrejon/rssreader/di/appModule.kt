@@ -13,7 +13,7 @@ val appModule = applicationContext {
 
     factory { GetFeedUseCase(get()) }
 
-    bean { DataRepository(get(), get()) as Repository }
+    bean { DataRepository(get(name = "local"), get(name = "remote")) as Repository }
 
 }
 

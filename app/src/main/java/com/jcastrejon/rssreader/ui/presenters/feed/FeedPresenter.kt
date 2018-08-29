@@ -1,7 +1,7 @@
 package com.jcastrejon.rssreader.ui.presenters.feed
 
 import com.jcastrejon.rssreader.R
-import com.jcastrejon.rssreader.common.EMPTY_STRING
+import com.jcastrejon.rssreader.utils.EMPTY_STRING
 import com.jcastrejon.rssreader.domain.models.*
 import com.jcastrejon.rssreader.domain.usecases.GetFeedUseCase
 import com.jcastrejon.rssreader.ui.contracts.feed.FeedContract

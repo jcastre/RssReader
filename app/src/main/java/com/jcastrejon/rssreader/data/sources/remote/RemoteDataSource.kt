@@ -1,6 +1,6 @@
 package com.jcastrejon.rssreader.data.sources.remote
 
-import com.jcastrejon.rssreader.common.BASE_URL
+import com.jcastrejon.rssreader.utils.BASE_URL
 import com.jcastrejon.rssreader.data.models.RSSFeed
 import com.jcastrejon.rssreader.data.sources.DataSource
 import com.jcastrejon.rssreader.data.sources.remote.mapper.Mapper
