@@ -18,7 +18,9 @@ interface DataSource {
 
     /**
      * Fill the data source with new data
+     *
+     * @param items the items to insert
      */
-    fun populateData(value: List<FeedItem>) { }
+    fun populateData(items: List<FeedItem>) { }
 
 }

@@ -9,7 +9,7 @@ import org.koin.dsl.module.applicationContext
 
 val remoteDataSourceModule = applicationContext {
 
-    factory { RemoteDataSource(get()) as DataSource }
+    factory(name ="remote") { RemoteDataSource(get()) as DataSource }
 
     factory { DataMapper() as Mapper<RSSFeed> }
 

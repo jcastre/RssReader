@@ -8,7 +8,7 @@ import com.jcastrejon.rssreader.domain.repository.Repository
  * Implementation of the repository of the domain layer
  */
 class DataRepository(
-        private val localDataSouce: DataSource,
+        private val localDataSource: DataSource,
         private val remoteDataSource: DataSource) : Repository {
 
     companion object {
@@ -21,23 +21,43 @@ class DataRepository(
 
     override fun getFeed(func: (Result<List<FeedItem>, DomainError>) -> Unit) {
         if (cache.isEmpty() || !isCacheUpdated()) {
-            remoteDataSource.getFeed { result -> handleGetFeedResult(result, func) }
+            remoteDataSource.getFeed { result -> handleGetFeedResultFromRemoteSource(result, func) }
         } else {
             func(Success(ArrayList(cache.values)))
         }
     }
 
     /**
-     * Handle the result of the get feed request
+     * Handle the result of the get feed request from the remote data source
      *
      * @param result the result of the request
      * @param func the callback to notify the finalization
      */
-    private fun handleGetFeedResult(result: Result<List<FeedItem>, DomainError>,
-                                    func: (Result<List<FeedItem>, DomainError>) -> Unit) {
+    private fun handleGetFeedResultFromRemoteSource(result: Result<List<FeedItem>, DomainError>,
+                                                    func: (Result<List<FeedItem>, DomainError>) -> Unit) {
         if (result is Success) {
             updateCache(result.value)
-            localDataSouce.populateData(result.value)
+            localDataSource.populateData(result.value)
+            func(result)
+        } else if (result is Error) {
+            if (result.value is InternetError) {
+                localDataSource.getFeed { localResult -> handleGetFeedResultFromLocalSource(localResult, func) }
+            } else {
+                func(result)
+            }
+        }
+    }
+
+    /**
+     * Handle the result of the get feed request from the local data source
+     *
+     * @param result the result of the request
+     * @param func the callback to notify the finalization
+     */
+    private fun handleGetFeedResultFromLocalSource(result: Result<List<FeedItem>, DomainError>,
+                                                   func: (Result<List<FeedItem>, DomainError>) -> Unit) {
+        if (result is Success) {
+            updateCache(result.value)
         }
         func(result)
     }
@@ -57,5 +77,4 @@ class DataRepository(
      * Establish if the cache is updated
      */
     private fun isCacheUpdated() = (System.currentTimeMillis() - lastUpdate) < ACCEPTABLE_TIME
-
 }
