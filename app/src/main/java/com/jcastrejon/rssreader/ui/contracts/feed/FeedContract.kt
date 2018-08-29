@@ -70,9 +70,9 @@ class FeedContract {
         /**
          * Navigate to the item detail screen
          *
-         * @param itemPosition, the position of the item
+         * @param id, the id of the item
          */
-        fun navigateToItemDetail(itemPosition: Int)
+        fun navigateToItemDetail(id: Int)
 
         /**
          * Set the message value
@@ -105,9 +105,9 @@ class FeedContract {
         /**
          * An item of the list was clicked
          *
-         * @param itemPosition, the position in the adapter
+         * @param id, the item id
          */
-        fun onItemClicked(itemPosition: Int)
+        fun onItemClicked(id: Int)
 
         /**
          * The search button was clicked

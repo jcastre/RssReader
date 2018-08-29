@@ -15,4 +15,12 @@ interface Repository {
      * @param func, the callback to notify the finalization
      */
     fun getFeed(func: (Result<List<FeedItem>, DomainError>) -> Unit)
+
+    /**
+     * Get and item of the feed
+     *
+     * @param itemId, the item id
+     * @param func, the callback to notify the finalization
+     */
+    fun getFeedItem(itemId: Int, func: (FeedItem) -> Unit)
 }

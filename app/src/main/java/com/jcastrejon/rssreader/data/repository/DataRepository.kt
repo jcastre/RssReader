@@ -27,6 +27,10 @@ class DataRepository(
         }
     }
 
+    override fun getFeedItem(itemId: Int, func: (FeedItem) -> Unit) {
+        func(cache[itemId]!!)
+    }
+
     /**
      * Handle the result of the get feed request from the remote data source
      *
