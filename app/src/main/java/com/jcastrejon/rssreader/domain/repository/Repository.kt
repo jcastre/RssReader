@@ -12,9 +12,10 @@ interface Repository {
     /**
      * Get the feed of the rss
      *
+     * @param filter, the filter to apply
      * @param func, the callback to notify the finalization
      */
-    fun getFeed(func: (Result<List<FeedItem>, DomainError>) -> Unit)
+    fun getFeed(filter: String, func: (Result<List<FeedItem>, DomainError>) -> Unit)
 
     /**
      * Get and item of the feed

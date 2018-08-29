@@ -12,4 +12,5 @@ data class FeedItem(@PrimaryKey
                     val title: String? = null,
                     val image: String? = null,
                     val description: String? = null,
-                    val link: String? = null)
+                    val link: String? = null,
+                    val date: String? = null)
