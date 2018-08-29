@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="filtered_item_round_corners">10dp</dimen>
+    <dimen name="filtered_item_stroke_width">1dp</dimen>
+    <dimen name="common_separator_distance">10dp</dimen>
+</resources>
