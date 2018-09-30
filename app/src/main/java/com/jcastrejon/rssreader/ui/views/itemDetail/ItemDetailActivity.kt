@@ -75,6 +75,10 @@ class ItemDetailActivity : BaseActivity(), ItemDetailContract.View {
         }
     }
 
+    override fun close() {
+        finish()
+    }
+
     /**
      * Initialize the listeners
      */

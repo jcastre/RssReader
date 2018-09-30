@@ -1,6 +1,5 @@
 package com.jcastrejon.rssreader.domain.usecases
 
-import com.jcastrejon.rssreader.domain.models.FeedItem
 import com.jcastrejon.rssreader.domain.repository.Repository
 
 /**
@@ -8,7 +7,5 @@ import com.jcastrejon.rssreader.domain.repository.Repository
  */
 class GetFeedItemUseCase(private val feedRepository: Repository) {
 
-    operator fun invoke(itemId: Int, func: (FeedItem) -> Unit) {
-        feedRepository.getFeedItem(itemId, func)
-    }
+    operator fun invoke(itemId: Int) = feedRepository.getFeedItem(itemId)
 }

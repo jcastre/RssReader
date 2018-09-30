@@ -57,8 +57,14 @@ class DataRepository(
         return Either.right(items)
     }
 
-    override fun getFeedItem(itemId: Int, func: (FeedItem) -> Unit) {
-        func(cache[itemId]!!)
+    override fun getFeedItem(itemId: Int): Either<DomainError, FeedItem> {
+        val item = cache[itemId]
+
+        return if (item != null) {
+            Either.right(item)
+        } else {
+            Either.left(UnknownError)
+        }
     }
 
     /**

@@ -19,7 +19,6 @@ interface Repository {
      * Get and item of the feed
      *
      * @param itemId, the item id
-     * @param func, the callback to notify the finalization
      */
-    fun getFeedItem(itemId: Int, func: (FeedItem) -> Unit)
+    fun getFeedItem(itemId: Int):  Either<DomainError, FeedItem>
 }
