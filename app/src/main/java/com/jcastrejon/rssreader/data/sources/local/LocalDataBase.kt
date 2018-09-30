@@ -7,7 +7,7 @@ import com.jcastrejon.rssreader.domain.models.FeedItem
 /**
  * The Room database for this app
  */
-@Database(entities = [FeedItem::class], version = 1)
+@Database(entities = [FeedItem::class], version = 1, exportSchema = false)
 abstract class LocalDataBase : RoomDatabase() {
 
     abstract fun feedDao(): FeedDao

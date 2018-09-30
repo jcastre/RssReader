@@ -1,22 +1,28 @@
 package com.jcastrejon.rssreader.ui.presenters.feed
 
+import arrow.core.Either
 import com.jcastrejon.rssreader.R
 import com.jcastrejon.rssreader.utils.EMPTY_STRING
 import com.jcastrejon.rssreader.domain.models.*
 import com.jcastrejon.rssreader.domain.usecases.GetFeedUseCase
 import com.jcastrejon.rssreader.ui.contracts.feed.FeedContract
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 
 /**
  * Presenter with the logic of the feed screen
  */
 class FeedPresenter(private val view: FeedContract.View,
-                    val getFeed: GetFeedUseCase) : FeedContract.Presenter {
+                    private val getFeed: GetFeedUseCase
+) : FeedContract.Presenter {
 
-    private var currentFilter = EMPTY_STRING
+    private var currentFilter: Filter = Filter.None
 
     override fun onResume() {
-        showLoading()
-        getFeed(currentFilter) { result -> handleResult(result)}
+        getRssFeed()
     }
 
     override fun onItemClicked(id: Int) {
@@ -24,12 +30,12 @@ class FeedPresenter(private val view: FeedContract.View,
     }
 
     override fun onSearchButtonClicked(input: String) {
-        if (input.trim() != EMPTY_STRING) {
-            showLoading()
-            getFeed(input.trim()) { result -> handleResult(result)}
-            view.closeKeyboard()
-            showFilter(input)
-            view.clearInput()
+        getFilteredRssFeed(input)
+    }
+
+    override fun onEditorAction(input: String, isActionDone: Boolean) {
+        if (isActionDone) {
+            getFilteredRssFeed(input)
         }
     }
 
@@ -40,29 +46,37 @@ class FeedPresenter(private val view: FeedContract.View,
     }
 
     override fun onRemoveButtonClicked() {
+        getRssFeed()
+        removeFilter()
+    }
+
+    /**
+     * Request the feed
+     */
+    private fun getRssFeed() = GlobalScope.launch(UI) {
         showLoading()
-        getFeed { result -> handleResult(result)}
-        currentFilter = EMPTY_STRING
-        view.removeFilter()
-        view.hideRemoveFilterButton()
-    }
 
-    /**
-     * Show the progress bar and hide the content
-     */
-    private fun showLoading() {
-        view.hideContent()
-        view.hideMessage()
-        view.showProgress()
-    }
+        val result = withContext(Dispatchers.Default) {
+            getFeed(currentFilter)
+        }
 
-    /**
-     * Handle the result and take the corresponding action
-     */
-    private fun handleResult(result: Result<List<FeedItem>, DomainError>) {
         when (result) {
-            is Success -> { handleSuccess(result.value) }
-            is Error -> { handleErrors(result.value) }
+            is Either.Left -> handleErrors(result.a)
+            is Either.Right -> handleSuccess(result.b)
+        }
+    }
+
+    /**
+     * Request the feed with a filter
+     *
+     * @param input, the text to filter with
+     */
+    private fun getFilteredRssFeed(input: String) {
+        if (input.trim() != EMPTY_STRING) {
+            view.closeKeyboard()
+            view.clearInput()
+            showFilter(input)
+            getRssFeed()
         }
     }
 
@@ -91,6 +105,15 @@ class FeedPresenter(private val view: FeedContract.View,
     }
 
     /**
+     * Show the progress bar and hide the content
+     */
+    private fun showLoading() {
+        view.hideContent()
+        view.hideMessage()
+        view.showProgress()
+    }
+
+    /**
      * Show the items
      *
      * @param items, the collection with the items
@@ -115,12 +138,21 @@ class FeedPresenter(private val view: FeedContract.View,
     /**
      * Show the filter item element and the remove button
      *
-     * @param filter the text value
+     * @param seed the text to filter the results
      */
-    private fun showFilter(filter: String) {
-        currentFilter = filter.trim()
-        view.setFilter(filter)
+    private fun showFilter(seed: String) {
+        currentFilter = Filter.Text(seed)
+        view.setFilter(seed)
         view.showFilter()
         view.showRemoveFilterButton()
+    }
+
+    /**
+     * Restart the filter
+     */
+    private fun removeFilter() {
+        currentFilter = Filter.None
+        view.removeFilter()
+        view.hideRemoveFilterButton()
     }
 }

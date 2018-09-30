@@ -1,5 +1,6 @@
 package com.jcastrejon.rssreader.domain.repository
 
+import arrow.core.Either
 import com.jcastrejon.rssreader.domain.models.DomainError
 import com.jcastrejon.rssreader.domain.models.FeedItem
 import com.jcastrejon.rssreader.domain.models.Result
@@ -11,11 +12,8 @@ interface Repository {
 
     /**
      * Get the feed of the rss
-     *
-     * @param filter, the filter to apply
-     * @param func, the callback to notify the finalization
      */
-    fun getFeed(filter: String, func: (Result<List<FeedItem>, DomainError>) -> Unit)
+    fun getFeed(): Either<DomainError, List<FeedItem>>
 
     /**
      * Get and item of the feed
