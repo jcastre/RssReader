@@ -22,6 +22,10 @@ class DataMapper: Mapper<RSSFeed> {
         private const val SRC_TAG = "src"
 
         private const val DATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss Z"
+
+        private const val PARAGRAPH = "p"
+
+        private const val BREAK_LINE = "\n"
     }
 
     override fun map(element: RSSFeed): List<FeedItem> {
@@ -41,9 +45,7 @@ class DataMapper: Mapper<RSSFeed> {
      * @param item, the data item
      */
     private fun createItem(id: Int, item: RSSFeedItem): FeedItem {
-        val tuple = parseDescription(item.description)
-
-        return FeedItem(id, item.title, tuple.first, tuple.second, item.link, parseDate(item.pubDate))
+        return FeedItem(id, item.title, getImageFromDescription(item.description), parseDescription(item.description), item.link, parseDate(item.pubDate))
     }
 
     /**
@@ -66,40 +68,64 @@ class DataMapper: Mapper<RSSFeed> {
     }
 
     /**
-     * parse the description field and return the image and the description
+     * parse the description field and return the first image that it found
      *
      * @param description the data description text
      */
-    private fun parseDescription(description: String?):Pair<String?, String?> {
+    private fun getImageFromDescription(description: String?): String? {
         var image: String? = null
-        var desc = String()
         var found = false
-        var finish = false
 
         if (description != null) {
-            val factory = XmlPullParserFactory.newInstance()
-            factory.isNamespaceAware = true
-            val xpp = factory.newPullParser()
-
-            xpp.setInput(StringReader(description))
+            val factory = XmlPullParserFactory.newInstance().apply { isNamespaceAware = true }
+            val xpp = factory.newPullParser().apply { setInput(StringReader(description)) }
             var eventType = xpp.eventType
 
-            while (eventType != XmlPullParser.END_DOCUMENT && !finish) {
-                if (eventType == XmlPullParser.START_TAG && xpp.name == IMG_TAG && !found) {
+            while (eventType != XmlPullParser.END_DOCUMENT && !found) {
+                if (eventType == XmlPullParser.START_TAG && xpp.name == IMG_TAG) {
                     image = xpp.getAttributeValue(null, SRC_TAG)
                     found = true
-                } else if (eventType == XmlPullParser.TEXT) {
-                    desc += xpp.text
                 }
 
                 try {
                     eventType = xpp.next()
-                } catch (e: XmlPullParserException) {
-                    finish = true
-                }
+                } catch (e: XmlPullParserException) { }
             }
         }
 
-        return Pair(image, desc)
+        return image
+    }
+
+    /**
+     * parse the description field
+     *
+     * @param description the data description text
+     */
+    private fun parseDescription(description: String?): String {
+        var desc = String()
+
+        if (description != null) {
+            val factory = XmlPullParserFactory.newInstance().apply { isNamespaceAware = true }
+            val xpp = factory.newPullParser().apply { setInput(StringReader(description)) }
+            var eventType = xpp.eventType
+
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                if (eventType == XmlPullParser.TEXT && xpp.text != null) {
+                    desc += xpp.text.trim()
+
+                    if (xpp.text.contains(BREAK_LINE)) {
+                        desc += BREAK_LINE
+                    }
+                } else if (eventType == XmlPullParser.END_TAG && xpp.name == PARAGRAPH) {
+                    desc += BREAK_LINE
+                }
+
+                try {
+                    eventType = xpp.next()
+                } catch (e: XmlPullParserException) { }
+            }
+        }
+
+        return desc.trim()
     }
 }
