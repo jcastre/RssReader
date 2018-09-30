@@ -44,6 +44,11 @@ class ItemDetailContract {
          * @param url the page url
          */
         fun openLinkInBrowser(url: String)
+
+        /**
+         * Close the activity
+         */
+        fun close()
     }
 
     /**

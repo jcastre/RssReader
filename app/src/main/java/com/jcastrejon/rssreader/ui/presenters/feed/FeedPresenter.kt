@@ -56,9 +56,7 @@ class FeedPresenter(private val view: FeedContract.View,
     private fun getRssFeed() = GlobalScope.launch(UI) {
         showLoading()
 
-        val result = withContext(Dispatchers.Default) {
-            getFeed(currentFilter)
-        }
+        val result = withContext(Dispatchers.Default) { getFeed(currentFilter) }
 
         when (result) {
             is Either.Left -> handleErrors(result.a)
@@ -152,6 +150,7 @@ class FeedPresenter(private val view: FeedContract.View,
      */
     private fun removeFilter() {
         currentFilter = Filter.None
+        view.setFilter(EMPTY_STRING)
         view.removeFilter()
         view.hideRemoveFilterButton()
     }

@@ -13,7 +13,6 @@ class RssReaderApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        startKoin(this,
-                listOf(appModule, localDataSourceModule, remoteDataSourceModule))
+        startKoin(this, listOf(appModule, localDataSourceModule, remoteDataSourceModule))
     }
 }
