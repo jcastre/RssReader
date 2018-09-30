@@ -1,5 +1,6 @@
 package com.jcastrejon.rssreader.data.sources.remote
 
+import arrow.core.Either
 import com.jcastrejon.rssreader.utils.BASE_URL
 import com.jcastrejon.rssreader.data.models.RSSFeed
 import com.jcastrejon.rssreader.data.sources.DataSource
@@ -15,7 +16,7 @@ import java.io.IOException
 /**
  * Implementation of the data source for remote operations
  */
-class RemoteDataSource(val mapper: Mapper<RSSFeed>): DataSource {
+class RemoteDataSource(private val mapper: Mapper<RSSFeed>) : DataSource {
 
     private val apiService: RemoteApiService
 
@@ -29,30 +30,21 @@ class RemoteDataSource(val mapper: Mapper<RSSFeed>): DataSource {
         apiService = retrofit.create(RemoteApiService::class.java)
     }
 
-    override fun getFeed(func: (Result<List<FeedItem>, DomainError>) -> Unit) {
-        apiService.getMovies().enqueue(object : Callback<RSSFeed> {
+    override fun getFeed(): Either<DomainError, List<FeedItem>> = try {
+        val response = apiService.getMovies().execute()
 
-            override fun onFailure(call: Call<RSSFeed>?, t: Throwable?) {
-                if (t is IOException) {
-                    func(Error(InternetError))
-                } else {
-                    func(Error(UnknownError))
-                }
+        if (response.isSuccessful && response.body() != null) {
+            val feed = response.body()
+
+            if (feed != null) {
+                Either.right(mapper.map(feed))
+            } else {
+                Either.right(listOf())
             }
-
-            override fun onResponse(call: Call<RSSFeed>?, response: Response<RSSFeed>?) {
-                if (response != null) {
-                    val feed = response.body()
-
-                    if (feed != null) {
-                        func(Success(mapper.map(feed)))
-                    } else {
-                        func(Success(listOf()))
-                    }
-                } else {
-                    func(Error(UnknownError))
-                }
-            }
-        })
+        } else {
+            Either.left(UnknownError)
+        }
+    } catch (e: IOException) {
+        Either.left(UnknownError)
     }
 }

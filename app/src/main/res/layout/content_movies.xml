@@ -24,6 +24,7 @@
             android:backgroundTint="@android:color/black"
             android:hint="@string/search"
             android:inputType="text"
+            android:imeOptions="actionDone"
             android:maxLines="1"
             android:paddingRight="@dimen/common_separator_distance"
             android:paddingLeft="@dimen/common_separator_distance"

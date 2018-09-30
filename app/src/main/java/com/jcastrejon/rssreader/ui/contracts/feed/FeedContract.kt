@@ -127,5 +127,13 @@ class FeedContract {
          * @param filter, the filter previously saved
          */
         fun stateRecovered(filter: String?)
+
+        /**
+         * Editor action detected
+         *
+         * @param input, the value of the input field
+         * @param isActionDone,
+         */
+        fun onEditorAction(input: String, isActionDone: Boolean)
     }
 }

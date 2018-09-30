@@ -3,6 +3,9 @@ package com.jcastrejon.rssreader.ui.views.feed
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import com.jcastrejon.rssreader.R
 import com.jcastrejon.rssreader.di.Params.FEED_VIEW
 import com.jcastrejon.rssreader.domain.models.FeedItem
@@ -133,5 +136,10 @@ class FeedActivity : BaseActivity(), FeedContract.View {
     private fun initializeListeners() {
         search_button.setOnClickListener { presenter.onSearchButtonClicked(input.text.toString()) }
         remove_button.setOnClickListener { presenter.onRemoveButtonClicked() }
+        input.setOnEditorActionListener {
+            _, actionId: Int, _ ->
+            presenter.onEditorAction(input.text.toString(), actionId == EditorInfo.IME_ACTION_DONE)
+            actionId == EditorInfo.IME_ACTION_DONE
+        }
     }
 }
